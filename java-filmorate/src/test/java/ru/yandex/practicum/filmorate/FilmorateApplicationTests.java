@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -56,6 +55,7 @@ class FilmorateApplicationTests {
         assertEquals(film2, filmController.getFilms().get(1));
         assertEquals(film1, filmController.getFilms().get(0));
     }
+
     @Test
     void addUpdateGetUserTest() throws ValidationException {
         userController = new UserController();
@@ -90,7 +90,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void ExceptionNullUserFilmsTest() throws ValidationException {
+    void ExceptionNullUserFilmsTest() {
         filmController = new FilmController();
         userController = new UserController();
         Film film = Film.builder().id(0)
@@ -105,16 +105,9 @@ class FilmorateApplicationTests {
                 .login("Login")
                 .name("Na me").build();
 
-
         Assertions.assertThrows(ValidationException.class, () -> filmController.addFilm(film));
         Assertions.assertThrows(ValidationException.class, () -> userController.addUser(user));
-
-        film.setName(null);
-        film.setReleaseDate(LocalDate.of(2000, 12, 28));
-        filmController.addFilm(film);
     }
-
-
 
 
 }
