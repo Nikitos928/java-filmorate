@@ -35,7 +35,7 @@ public class UserController {
         return user;
     }
 
-    @PatchMapping(value = "/users")
+    @PutMapping(value = "/users")
     public User updateUser(@RequestBody User user) {
         log.info("Получен запрос: update-user");
         users.put(user.getId(), user);
