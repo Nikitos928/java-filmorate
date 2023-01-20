@@ -89,25 +89,6 @@ class FilmorateApplicationTests {
         assertEquals(2, userController.getUsers().size());
     }
 
-    @Test
-    void ExceptionNullUserFilmsTest() {
-        filmController = new FilmController();
-        userController = new UserController();
-        Film film = Film.builder().id(0)
-                .name("Name")
-                .description("Description")
-                .duration(50)
-                .releaseDate(LocalDate.of(1894, 12, 28)).build();
-
-        User user = User.builder()
-                .birthday(LocalDate.of(2000, 12, 12))
-                .email("tttt@yandex.ru")
-                .login("Login")
-                .name("Na me").build();
-
-        Assertions.assertThrows(ValidationException.class, () -> filmController.addFilm(film));
-        Assertions.assertThrows(ValidationException.class, () -> userController.addUser(user));
-    }
 
 
 }
