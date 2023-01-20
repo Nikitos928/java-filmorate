@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,7 @@ public class UserController {
     private int generatedId = 1;
 
     @PostMapping(value = "/users")
-    public User addUser(@Valid @RequestBody User user) throws ValidationException {
+    public User addUser(@Valid @RequestBody User user) {
         log.info("Получен запрос: add-user");
         if (user.getLogin().contains(" ")) {
             log.info("Name содержит пробел");
@@ -35,14 +34,14 @@ public class UserController {
         return user;
     }
 
-    @PutMapping (value = "/users")
+    @PutMapping(value = "/users")
     public User updateUser(@RequestBody User user) throws ValidationException {
         log.info("Получен запрос: update-user");
-        if (users.containsKey(user.getId())){
+        if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             return user;
         } else {
-            throw new ValidationException("Фильма с таки id нет");
+            throw new ValidationException("Пользователя с таки id нет");
         }
     }
 

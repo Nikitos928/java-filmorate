@@ -25,8 +25,9 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void addUpdateGetFilmTest() throws ValidationException {
-        Film film = Film.builder().name("Name")
+    void addUpdateGetFilmValidationExceptionTest() throws ValidationException {
+        Film film = Film.builder()
+                .name("Name")
                 .description("Description")
                 .duration(30)
                 .releaseDate(LocalDate.of(2000, 12, 12)).build();
@@ -39,7 +40,8 @@ class FilmorateApplicationTests {
                 .name("Name")
                 .description("Description")
                 .duration(50)
-                .releaseDate(LocalDate.of(2000, 12, 12)).build();
+                .releaseDate(LocalDate.of(2000, 12, 12))
+                .build();
         filmController.updateFilm(film1);
         assertEquals(film1, filmController.getFilms().get(0));
 
@@ -47,35 +49,59 @@ class FilmorateApplicationTests {
                 .name("Name")
                 .description("Description")
                 .duration(50)
-                .releaseDate(LocalDate.of(2000, 12, 12)).build();
+                .releaseDate(LocalDate.of(2000, 12, 12))
+                .build();
 
         filmController.addFilm(film2);
 
         assertEquals(2, filmController.getFilms().size());
         assertEquals(film2, filmController.getFilms().get(1));
         assertEquals(film1, filmController.getFilms().get(0));
+
+        Film film3 = Film.builder()
+                .id(10)
+                .name("Name")
+                .description("Description")
+                .duration(50)
+                .releaseDate(LocalDate.of(2000, 12, 12))
+                .build();
+
+        Assertions.assertThrows(ValidationException.class,()->filmController.updateFilm(film3));
+
+        Film film4 = Film.builder()
+                .name("Name")
+                .description("Description")
+                .duration(30)
+                .releaseDate(LocalDate.of(1895, 12, 27))
+                .build();
+
+        Assertions.assertThrows(ValidationException.class,()->filmController.addFilm(film4));
     }
 
-  /*  @Test
-    void addUpdateGetUserTest() throws ValidationException {
+    @Test
+    void addUpdateGetUserValidationExceptionTest() throws ValidationException {
         userController = new UserController();
         User user = User.builder()
                 .birthday(LocalDate.of(2000, 12, 12))
                 .email("tttt@yandex.ru")
                 .login("Login")
-                .name("Name").build();
+                .name("Name")
+                .build();
 
         userController.addUser(user);
 
         assertEquals(user, userController.getUsers().get(0));
 
         User user1 = User.builder()
+                .id(1)
                 .birthday(LocalDate.of(2000, 12, 12))
                 .email("tt@yandex.ru")
                 .login("Login")
-                .name("Name").build();
+                .name("Name")
+                .build();
 
         userController.updateUser(user1);
+
         assertEquals(user1, userController.getUsers().get(0));
         assertEquals(1, userController.getUsers().size());
 
@@ -84,10 +110,24 @@ class FilmorateApplicationTests {
                 .email("yyyy@yandex.ru")
                 .login("Login1")
                 .name("Name1").build();
+
         userController.addUser(user2);
+
         assertEquals(user2, userController.getUsers().get(1));
-        assertEquals(2, userController.getUsers().size());*/
+        assertEquals(2, userController.getUsers().size());
+
+        User user3 = User.builder()
+                .id(99)
+                .birthday(LocalDate.of(2000, 12, 12))
+                .email("tt@yandex.ru")
+                .login("Login")
+                .name("Name").build();
+
+        Assertions.assertThrows(ValidationException.class,()->userController.updateUser(user3));
+
     }
+
+}
 
 
 
