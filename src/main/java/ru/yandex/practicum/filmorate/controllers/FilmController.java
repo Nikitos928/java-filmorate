@@ -18,7 +18,7 @@ public class FilmController {
     private Map<Integer, Film> films = new HashMap<>();
     protected int generatedId;
 
-    @PutMapping(value = "/films")
+    @PostMapping(value = "/films")
     public Film addFilm(@Valid @RequestBody Film film) throws ValidationException {
         log.info("Получен запрос: add-film");
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
@@ -31,7 +31,7 @@ public class FilmController {
         return film;
     }
 
-    @PatchMapping(value = "/films")
+    @PutMapping(value = "/films")
     public Film updateFilm(@RequestBody Film film) {
         log.info("Получен запрос: update-film");
         films.put(film.getId(), film);
