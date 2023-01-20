@@ -24,7 +24,7 @@ public class UserController {
         log.info("Получен запрос: add-user");
         if (user.getName().contains(" ")) {
             log.info("Name содержит пробел");
-            throw new ValidationException("Name не может содержать пробел");
+            user.setName(user.getName().replace(" ", ""));
         }
         if (user.getLogin() == null) {
             user.setLogin(user.getName());
@@ -35,7 +35,7 @@ public class UserController {
         return user;
     }
 
-    @PutMapping(value = "/users")
+    @PatchMapping (value = "/users")
     public User updateUser(@RequestBody User user) {
         log.info("Получен запрос: update-user");
         users.put(user.getId(), user);
@@ -44,7 +44,6 @@ public class UserController {
 
     @GetMapping("/users")
     public List<User> getUsers() {
-
         return new ArrayList<>(users.values());
     }
 
