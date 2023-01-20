@@ -36,10 +36,14 @@ public class UserController {
     }
 
     @PutMapping (value = "/users")
-    public User updateUser(@RequestBody User user) {
+    public User updateUser(@RequestBody User user) throws ValidationException {
         log.info("Получен запрос: update-user");
-        users.put(user.getId(), user);
-        return user;
+        if (users.containsKey(user.getId())){
+            users.put(user.getId(), user);
+            return user;
+        } else {
+            throw new ValidationException("Фильма с таки id нет");
+        }
     }
 
     @GetMapping("/users")

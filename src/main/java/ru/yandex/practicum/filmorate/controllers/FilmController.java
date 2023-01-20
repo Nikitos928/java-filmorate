@@ -16,7 +16,7 @@ import java.util.Map;
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private Map<Integer, Film> films = new HashMap<>();
-    protected int generatedId;
+    protected int generatedId = 1;
 
     @PostMapping(value = "/films")
     public Film addFilm(@Valid @RequestBody Film film) throws ValidationException {
