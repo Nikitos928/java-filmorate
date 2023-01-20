@@ -35,7 +35,7 @@ class FilmorateApplicationTests {
         filmController.addFilm(film);
         assertEquals(film, filmController.getFilms().get(0));
 
-        Film film1 = Film.builder().id(0)
+        Film film1 = Film.builder().id(1)
                 .name("Name")
                 .description("Description")
                 .duration(50)
@@ -56,9 +56,9 @@ class FilmorateApplicationTests {
         assertEquals(film1, filmController.getFilms().get(0));
     }
 
-    @Test
+  /*  @Test
     void addUpdateGetUserTest() throws ValidationException {
-      /*  userController = new UserController();
+        userController = new UserController();
         User user = User.builder()
                 .birthday(LocalDate.of(2000, 12, 12))
                 .email("tttt@yandex.ru")
@@ -91,4 +91,4 @@ class FilmorateApplicationTests {
 
 
 
-}
+
