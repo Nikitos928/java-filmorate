@@ -17,17 +17,17 @@ import java.util.Map;
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private Map<Integer, User> users = new HashMap<>();
-    private int generatedId;
+    private int generatedId = 1;
 
     @PostMapping(value = "/users")
     public User addUser(@Valid @RequestBody User user) throws ValidationException {
         log.info("Получен запрос: add-user");
-        if (user.getName().contains(" ")) {
+        if (user.getLogin().contains(" ")) {
             log.info("Name содержит пробел");
-            user.setName(user.getName().replace(" ", ""));
+            user.setLogin(user.getLogin().replace(" ", ""));
         }
-        if (user.getLogin() == null) {
-            user.setLogin(user.getName());
+        if (user.getName() == null) {
+            user.setName(user.getLogin());
         }
         user.setId(generatedId);
         users.put(generatedId, user);

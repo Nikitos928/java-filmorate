@@ -32,10 +32,15 @@ public class FilmController {
     }
 
     @PutMapping(value = "/films")
-    public Film updateFilm(@RequestBody Film film) {
+    public Film updateFilm(@RequestBody Film film) throws ValidationException {
         log.info("Получен запрос: update-film");
-        films.put(film.getId(), film);
-        return film;
+        if (films.containsKey(film.getId())){
+            films.put(film.getId(), film);
+            return film;
+        } else {
+            throw new ValidationException("Фильма с таки id нет");
+        }
+
     }
 
     @GetMapping("/films")
