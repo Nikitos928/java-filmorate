@@ -3,10 +3,7 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
@@ -22,7 +19,7 @@ public class UserController {
     private Map<Integer, User> users = new HashMap<>();
     private int generatedId;
 
-    @PostMapping(value = "/add-user")
+    @PostMapping(value = "/users")
     public User addUser(@Valid @RequestBody User user) throws ValidationException {
         log.info("Получен запрос: add-user");
         if (user.getName().contains(" ")) {
@@ -38,14 +35,14 @@ public class UserController {
         return user;
     }
 
-    @PostMapping(value = "/update-user")
+    @PatchMapping(value = "/users")
     public User updateUser(@RequestBody User user) {
         log.info("Получен запрос: update-user");
         users.put(user.getId(), user);
         return user;
     }
 
-    @GetMapping("/get-users")
+    @GetMapping("/users")
     public List<User> getUsers() {
 
         return new ArrayList<>(users.values());

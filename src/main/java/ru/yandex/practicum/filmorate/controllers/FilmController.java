@@ -2,10 +2,7 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
@@ -21,7 +18,7 @@ public class FilmController {
     private Map<Integer, Film> films = new HashMap<>();
     protected int generatedId;
 
-    @PostMapping(value = "/add-film")
+    @PostMapping(value = "/films")
     public Film addFilm(@Valid @RequestBody Film film) throws ValidationException {
         log.info("Получен запрос: add-film");
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
@@ -34,14 +31,14 @@ public class FilmController {
         return film;
     }
 
-    @PostMapping(value = "/update-film")
+    @PatchMapping(value = "/films")
     public Film updateFilm(@RequestBody Film film) {
         log.info("Получен запрос: update-film");
         films.put(film.getId(), film);
         return film;
     }
 
-    @GetMapping("/get-films")
+    @GetMapping("/films")
     public List<Film> getFilms() {
         log.info("Получен запрос: get-films");
         return new ArrayList<>(films.values());
