@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
+import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,9 +10,15 @@ import ru.yandex.practicum.filmorate.controllers.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
 @SpringBootTest
@@ -20,10 +27,23 @@ class FilmorateApplicationTests {
     FilmController filmController;
     UserController userController;
 
+    private Validator validator;
+
     @Test
     void contextLoads() {
     }
 
+    @Test
+    public void testContactSuccess() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+
+        User contact = User.builder()
+        .email("")
+        .name("Jack").build();
+        Set<ConstraintViolation<User>> violations = validator.validate(contact);
+        assertFalse(violations.isEmpty());
+    }
     @Test
     void addUpdateGetFilmValidationExceptionTest() throws ValidationException {
         Film film = Film.builder()

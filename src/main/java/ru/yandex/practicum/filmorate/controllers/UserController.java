@@ -14,17 +14,14 @@ import java.util.Map;
 
 @RestController
 public class UserController {
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private Map<Integer, User> users = new HashMap<>();
+    private final Logger log = LoggerFactory.getLogger(UserController.class);
+    private final Map<Integer, User> users = new HashMap<>();
     private int generatedId = 1;
 
     @PostMapping(value = "/users")
-    public User addUser(@Valid @RequestBody User user) {
+    public User addUser(@Valid @RequestBody User user) throws ValidationException {
         log.info("Получен запрос: add-user");
-        if (user.getLogin().contains(" ")) {
-            log.info("Name содержит пробел");
-            user.setLogin(user.getLogin().replace(" ", ""));
-        }
+        whitespaceСheck(user);
         if (user.getName() == null) {
             user.setName(user.getLogin());
         }
@@ -37,11 +34,12 @@ public class UserController {
     @PutMapping(value = "/users")
     public User updateUser(@RequestBody User user) throws ValidationException {
         log.info("Получен запрос: update-user");
+        whitespaceСheck(user);
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             return user;
         } else {
-            throw new ValidationException("Пользователя с таки id нет");
+            throw new ValidationException("Пользователя с таким id нет");
         }
     }
 
@@ -49,5 +47,13 @@ public class UserController {
     public List<User> getUsers() {
         return new ArrayList<>(users.values());
     }
+
+    public void whitespaceСheck (User user) throws ValidationException {
+            if (user.getLogin().contains(" ")) {
+                log.info("Name содержит пробел");
+                throw new ValidationException("Name содержит пробел");
+            }
+    }
+
 
 }
