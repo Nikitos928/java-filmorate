@@ -14,14 +14,14 @@ import java.util.Map;
 
 @RestController
 public class UserController {
-    private final Logger log = LoggerFactory.getLogger(UserController.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final Map<Integer, User> users = new HashMap<>();
     private int generatedId = 1;
 
     @PostMapping(value = "/users")
     public User addUser(@Valid @RequestBody User user) throws ValidationException {
         log.info("Получен запрос: add-user");
-        whitespaceСheck(user);
+        checkWhitespace(user);
         if (user.getName() == null) {
             user.setName(user.getLogin());
         }
@@ -32,9 +32,9 @@ public class UserController {
     }
 
     @PutMapping(value = "/users")
-    public User updateUser(@RequestBody User user) throws ValidationException {
+    public User updateUser(@Valid @RequestBody User user) throws ValidationException {
         log.info("Получен запрос: update-user");
-        whitespaceСheck(user);
+        checkWhitespace(user);
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             return user;
@@ -48,7 +48,7 @@ public class UserController {
         return new ArrayList<>(users.values());
     }
 
-    public void whitespaceСheck (User user) throws ValidationException {
+    public void checkWhitespace (User user) throws ValidationException {
             if (user.getLogin().contains(" ")) {
                 log.info("Name содержит пробел");
                 throw new ValidationException("Name содержит пробел");
