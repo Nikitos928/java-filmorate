@@ -22,7 +22,7 @@ public class UserController {
     public User addUser(@Valid @RequestBody User user) throws ValidationException {
         log.info("Получен запрос: add-user");
         checkWhitespace(user);
-        if (user.getName() == null) {
+        if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
         user.setId(generatedId);
@@ -35,6 +35,9 @@ public class UserController {
     public User updateUser(@Valid @RequestBody User user) throws ValidationException {
         log.info("Получен запрос: update-user");
         checkWhitespace(user);
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             return user;
@@ -48,11 +51,11 @@ public class UserController {
         return new ArrayList<>(users.values());
     }
 
-    public void checkWhitespace (User user) throws ValidationException {
-            if (user.getLogin().contains(" ")) {
-                log.info("Name содержит пробел");
-                throw new ValidationException("Name содержит пробел");
-            }
+    private void checkWhitespace(User user) throws ValidationException {
+        if (user.getLogin().contains(" ")) {
+            log.info("Login содержит пробел");
+            throw new ValidationException("Name содержит пробел");
+        }
     }
 
 

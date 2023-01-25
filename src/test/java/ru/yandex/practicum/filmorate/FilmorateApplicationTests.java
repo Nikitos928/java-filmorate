@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate;
 
-import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,6 @@ import java.time.LocalDate;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
 @SpringBootTest
@@ -33,11 +31,13 @@ class FilmorateApplicationTests {
     @Test
     void contextLoads() {
     }
+
     @BeforeEach
     public void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
+
     @Test
     public void validationUserDateTest() {
         User user = User.builder()
@@ -63,6 +63,7 @@ class FilmorateApplicationTests {
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(1, violations.size());
     }
+
     @Test
     public void validationUserLoginTest() {
         User user = User.builder()
@@ -128,6 +129,7 @@ class FilmorateApplicationTests {
         System.out.println(violations);
         assertEquals(1, violations.size());
     }
+
     @Test
     public void validationFilmDurationPositiveTest() {
         Film film = Film.builder()
@@ -184,7 +186,7 @@ class FilmorateApplicationTests {
                 .releaseDate(LocalDate.of(2000, 12, 12))
                 .build();
 
-        Assertions.assertThrows(ValidationException.class,()->filmController.updateFilm(film3));
+        Assertions.assertThrows(ValidationException.class, () -> filmController.updateFilm(film3));
 
 
         Film film4 = Film.builder()
@@ -194,7 +196,7 @@ class FilmorateApplicationTests {
                 .releaseDate(LocalDate.of(1895, 12, 27))
                 .build();
 
-        Assertions.assertThrows(ValidationException.class,()->filmController.addFilm(film4));
+        Assertions.assertThrows(ValidationException.class, () -> filmController.addFilm(film4));
 
         Film film5 = Film.builder()
                 .name("Name")
@@ -203,8 +205,7 @@ class FilmorateApplicationTests {
                 .releaseDate(LocalDate.of(1895, 12, 27))
                 .build();
 
-        Assertions.assertThrows(ValidationException.class,()->filmController.updateFilm(film5));
-
+        Assertions.assertThrows(ValidationException.class, () -> filmController.updateFilm(film5));
 
 
     }
@@ -254,7 +255,7 @@ class FilmorateApplicationTests {
                 .login("Login")
                 .name("Name").build();
 
-        Assertions.assertThrows(ValidationException.class,()->userController.updateUser(user3));
+        Assertions.assertThrows(ValidationException.class, () -> userController.updateUser(user3));
 
         User user4 = User.builder()
                 .birthday(LocalDate.of(2000, 12, 12))
@@ -262,9 +263,9 @@ class FilmorateApplicationTests {
                 .login("Lo gin")
                 .name("Name").build();
 
-        Assertions.assertThrows(ValidationException.class,()->userController.updateUser(user4));
+        Assertions.assertThrows(ValidationException.class, () -> userController.updateUser(user4));
 
-        Assertions.assertThrows(ValidationException.class,()->userController.addUser(user4));
+        Assertions.assertThrows(ValidationException.class, () -> userController.addUser(user4));
 
         User user5 = User.builder()
                 .birthday(LocalDate.of(2000, 12, 12))
