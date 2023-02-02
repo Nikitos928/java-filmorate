@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -35,6 +37,10 @@ public class UserService {
         return userStorage.getUser(id);
     }
     public User addFriend(Long userId, Long friendId){
+        checkId(userId);
+        if (0>friendId){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
         User user = userStorage.getUser(userId);
         User friend = userStorage.getUser(friendId);
         user.getFriends().add(friend.getId());
@@ -73,7 +79,7 @@ public class UserService {
         }
         if (userStorage.getUser(id) == null) {
             throw new UserNotFoundException(String.format(
-                    "Фильм %s не найден",
+                    "Пользователь %s не найден",
                     id));
         }
     }

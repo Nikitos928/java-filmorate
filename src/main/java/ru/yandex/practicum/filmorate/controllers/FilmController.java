@@ -4,10 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.controllers.ErrorHandler;
+
 
 import javax.validation.Valid;
 import java.util.List;
@@ -47,6 +48,7 @@ public class FilmController {
 
     @DeleteMapping("/{id}/like/{userId}")
     public Film deleteLike(@PathVariable(value = "id") Long filmId,@PathVariable(value = "userId") Long userId){
+
     return filmService.deleteLike(filmId, userId);
     }
 

@@ -4,7 +4,9 @@ package ru.yandex.practicum.filmorate.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.ErrorResponse;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -41,6 +43,7 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     public User addFriend(@PathVariable(value = "id") Long userId, @PathVariable(value = "friendId") Long friendId) {
+
         return userService.addFriend(userId, friendId);
     }
 
@@ -58,5 +61,7 @@ public class UserController {
     public List<User> mutualFriends(@PathVariable(value = "id") Long userId, @PathVariable(value = "otherId") Long otherId) {
         return userService.mutualFriends(userId, otherId);
     }
+
+
 
 }

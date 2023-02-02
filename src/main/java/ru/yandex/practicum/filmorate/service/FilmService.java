@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -46,6 +47,9 @@ public class FilmService {
 
     public Film addLike (Long filmId, Long userId){
         checkId(filmId);
+        if (userStorage.getUser(userId) == null){
+            throw new IllegalArgumentException("ID не может быть отрицательным");
+        }
         Film film = filmStorage.getFilm(filmId);
         User user = userStorage.getUser(userId);
         film.getLike().add(user.getId());
@@ -54,6 +58,10 @@ public class FilmService {
     }
 
     public Film deleteLike (Long filmId, Long userId){
+        if (0 > userId){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        checkId(filmId);
         Film film = filmStorage.getFilm(filmId);
         User user = userStorage.getUser(userId);
         film.getLike().remove(user.getId());
@@ -71,7 +79,7 @@ public class FilmService {
 
     private void checkId (Long id){
         if (id<1){
-            throw new IllegalArgumentException("ID не может быть отрицательным");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         if (filmStorage.getFilm(id) == null) {
             throw new UserNotFoundException(String.format(
