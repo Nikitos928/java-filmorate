@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.ConversionNotSupportedException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -38,11 +40,15 @@ public class FilmService {
     }
 
     public Film getFilm(Long id){
+        if (id<1){
+            throw new IllegalArgumentException("Число не может быть отрицательным");
+        }
         if (filmStorage.getFilm(id) == null) {
             throw new UserNotFoundException(String.format(
                     "Пользователь %s не найден",
                     id));
         }
+
         return filmStorage.getFilm(id);
     }
 
