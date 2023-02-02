@@ -31,14 +31,7 @@ public class UserService {
 
 
     public User getUser(Long id){
-        if (id<1){
-            throw new IllegalArgumentException("Число не может быть отрицательным");
-        }
-        if (userStorage.getUser(id) == null) {
-            throw new UserNotFoundException(String.format(
-                    "Пользователь %s не найден",
-                    id));
-        }
+        checkId(id);
         return userStorage.getUser(id);
     }
     public User addFriend(Long userId, Long friendId){
@@ -72,5 +65,16 @@ public class UserService {
     public List <User> getFriends (Long id){
         User user = userStorage.getUser(id);
        return user.getFriends().stream().map(userStorage :: getUser).collect(Collectors.toList());
+    }
+
+    private void checkId (Long id){
+        if (id<1){
+            throw new IllegalArgumentException("ID не может быть отрицательным");
+        }
+        if (userStorage.getUser(id) == null) {
+            throw new UserNotFoundException(String.format(
+                    "Фильм %s не найден",
+                    id));
+        }
     }
 }

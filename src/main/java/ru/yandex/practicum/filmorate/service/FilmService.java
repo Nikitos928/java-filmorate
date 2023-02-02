@@ -40,19 +40,12 @@ public class FilmService {
     }
 
     public Film getFilm(Long id){
-        if (id<1){
-            throw new IllegalArgumentException("Число не может быть отрицательным");
-        }
-        if (filmStorage.getFilm(id) == null) {
-            throw new UserNotFoundException(String.format(
-                    "Пользователь %s не найден",
-                    id));
-        }
-
+        checkId(id);
         return filmStorage.getFilm(id);
     }
 
     public Film addLike (Long filmId, Long userId){
+        checkId(filmId);
         Film film = filmStorage.getFilm(filmId);
         User user = userStorage.getUser(userId);
         film.getLike().add(user.getId());
@@ -73,6 +66,18 @@ public class FilmService {
                 .sorted(Comparator.comparing(film -> film.getLike().size()*-1))
                 .limit(cout)
                 .collect(Collectors.toList());
+    }
+
+
+    private void checkId (Long id){
+        if (id<1){
+            throw new IllegalArgumentException("ID не может быть отрицательным");
+        }
+        if (filmStorage.getFilm(id) == null) {
+            throw new UserNotFoundException(String.format(
+                    "Фильм %s не найден",
+                    id));
+        }
     }
 
 }
