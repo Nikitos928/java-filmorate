@@ -9,6 +9,11 @@ import ru.yandex.practicum.filmorate.controllers.UserController;
 import ru.yandex.practicum.filmorate.controllers.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -28,12 +33,20 @@ class FilmorateApplicationTests {
 
     private Validator validator;
 
+    InMemoryFilmStorage filmStorage;
+
+    InMemoryUserStorage userStorage;
+
     @Test
     void contextLoads() {
     }
 
     @BeforeEach
     public void setUp() {
+        filmStorage = new InMemoryFilmStorage();
+        userStorage = new InMemoryUserStorage();
+        userController = new UserController(new UserService(userStorage));
+
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
@@ -146,17 +159,20 @@ class FilmorateApplicationTests {
 
     @Test
     void addUpdateGetFilmValidationExceptionTest() throws ValidationException {
+
+
         Film film = Film.builder()
                 .name("Name")
                 .description("Description")
                 .duration(30)
                 .releaseDate(LocalDate.of(2000, 12, 12)).build();
 
-        filmController = new FilmController();
+
+        filmController = new FilmController(new FilmService(filmStorage, new InMemoryUserStorage()));
         filmController.addFilm(film);
         assertEquals(film, filmController.getFilms().get(0));
 
-        Film film1 = Film.builder().id(1)
+        Film film1 = Film.builder().id(1L)
                 .name("Name")
                 .description("Description")
                 .duration(50)
@@ -179,7 +195,7 @@ class FilmorateApplicationTests {
         assertEquals(film1, filmController.getFilms().get(0));
 
         Film film3 = Film.builder()
-                .id(10)
+                .id(10L)
                 .name("Name")
                 .description("Description")
                 .duration(50)
@@ -212,7 +228,8 @@ class FilmorateApplicationTests {
 
     @Test
     void addUpdateGetUserValidationExceptionTest() throws ValidationException {
-        userController = new UserController();
+        userStorage = new InMemoryUserStorage();
+        userController = new UserController(new UserService(userStorage));
         User user = User.builder()
                 .birthday(LocalDate.of(2000, 12, 12))
                 .email("tttt@yandex.ru")
@@ -225,7 +242,7 @@ class FilmorateApplicationTests {
         assertEquals(user, userController.getUsers().get(0));
 
         User user1 = User.builder()
-                .id(1)
+                .id(1L)
                 .birthday(LocalDate.of(2000, 12, 12))
                 .email("tt@yandex.ru")
                 .login("Login")
@@ -249,7 +266,7 @@ class FilmorateApplicationTests {
         assertEquals(2, userController.getUsers().size());
 
         User user3 = User.builder()
-                .id(99)
+                .id(99L)
                 .birthday(LocalDate.of(2000, 12, 12))
                 .email("tt@yandex.ru")
                 .login("Login")

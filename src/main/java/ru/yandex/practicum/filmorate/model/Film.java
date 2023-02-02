@@ -11,6 +11,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 
 @Data
@@ -18,7 +20,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class Film {
-    private int id;
+    private Long id;
     @NotEmpty
     private String name;
     @Size(max = 200, message = "Длинна описания должна быть не больше 200 символов")
@@ -27,4 +29,13 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private int duration;
+    private Set<Long> like = new LinkedHashSet<>();
+
+    public void addLike(Long id) {
+        like.add(id);
+    }
+
+    public void removeLike(Long id) {
+        like.remove(id);
+    }
 }
