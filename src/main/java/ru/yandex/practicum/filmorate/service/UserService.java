@@ -31,6 +31,9 @@ public class UserService {
 
 
     public User getUser(Long id){
+        if (id<1){
+            throw new IllegalArgumentException("Число не может быть отрицательным");
+        }
         if (userStorage.getUser(id) == null) {
             throw new UserNotFoundException(String.format(
                     "Пользователь %s не найден",
