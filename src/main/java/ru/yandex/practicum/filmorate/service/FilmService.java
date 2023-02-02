@@ -3,7 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.controllers.ValidationException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -37,6 +38,11 @@ public class FilmService {
     }
 
     public Film getFilm(Long id){
+        if (filmStorage.getFilm(id) == null) {
+            throw new UserNotFoundException(String.format(
+                    "Пользователь %s не найден",
+                    id));
+        }
         return filmStorage.getFilm(id);
     }
 
