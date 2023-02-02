@@ -31,11 +31,4 @@ public class Film {
     private int duration;
     private Set<Long> like = new LinkedHashSet<>();
 
-    public void addLike(Long id) {
-        like.add(id);
-    }
-
-    public void removeLike(Long id) {
-        like.remove(id);
-    }
 }

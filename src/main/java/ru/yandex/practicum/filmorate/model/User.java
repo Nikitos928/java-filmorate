@@ -28,11 +28,4 @@ public class User {
     private LocalDate birthday;
     private Set<Long> friends = new LinkedHashSet<>();
 
-    public void addFriend(Long id) {
-        friends.add(id);
-    }
-
-    public void removeFriend(Long id) {
-        friends.remove(id);
-    }
 }

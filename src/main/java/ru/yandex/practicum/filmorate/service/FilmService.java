@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,25 +28,25 @@ public class FilmService {
 
 
     public Film addFilm(Film film) throws ValidationException {
-    return filmStorage.addFilm(film);
+        return filmStorage.addFilm(film);
     }
 
-    public Film updateFilm(Film film) throws ValidationException{
+    public Film updateFilm(Film film) throws ValidationException {
         return filmStorage.updateFilm(film);
     }
 
-    public List<Film> getFilms(){
+    public List<Film> getFilms() {
         return filmStorage.getFilms();
     }
 
-    public Film getFilm(Long id){
+    public Film getFilm(Long id) {
         checkId(id);
         return filmStorage.getFilm(id);
     }
 
-    public Film addLike (Long filmId, Long userId){
+    public Film addLike(Long filmId, Long userId) {
         checkId(filmId);
-        if (userStorage.getUser(userId) == null){
+        if (userStorage.getUser(userId) == null) {
             throw new IllegalArgumentException("ID не может быть отрицательным");
         }
         Film film = filmStorage.getFilm(filmId);
@@ -57,8 +56,8 @@ public class FilmService {
         return film;
     }
 
-    public Film deleteLike (Long filmId, Long userId){
-        if (0 > userId){
+    public Film deleteLike(Long filmId, Long userId) {
+        if (0 > userId) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         checkId(filmId);
@@ -68,18 +67,18 @@ public class FilmService {
         return film;
     }
 
-    public List<Film> getPopularFilms(Long cout){
+    public List<Film> getPopularFilms(Long cout) {
         return filmStorage.getFilms()
                 .stream()
-                .sorted(Comparator.comparing(film -> film.getLike().size()*-1))
+                .sorted(Comparator.comparing(film -> film.getLike().size() * -1))
                 .limit(cout)
                 .collect(Collectors.toList());
     }
 
 
-    private void checkId (Long id){
-        if (id<1){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    private void checkId(Long id) {
+        if (id < 1) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         if (filmStorage.getFilm(id) == null) {
             throw new UserNotFoundException(String.format(

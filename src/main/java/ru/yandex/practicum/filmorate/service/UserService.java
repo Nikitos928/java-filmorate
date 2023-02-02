@@ -19,26 +19,27 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserStorage userStorage;
 
-    public User addUser(User user) throws ValidationException{
+    public User addUser(User user) throws ValidationException {
         return userStorage.addUser(user);
     }
 
-    public User updateUser(User user) throws ValidationException{
+    public User updateUser(User user) throws ValidationException {
         return userStorage.updateUser(user);
     }
 
-    public List<User> getUsers(){
+    public List<User> getUsers() {
         return userStorage.getUsers();
     }
 
 
-    public User getUser(Long id){
+    public User getUser(Long id) {
         checkId(id);
         return userStorage.getUser(id);
     }
-    public User addFriend(Long userId, Long friendId){
+
+    public User addFriend(Long userId, Long friendId) {
         checkId(userId);
-        if (0>friendId){
+        if (0 > friendId) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         User user = userStorage.getUser(userId);
@@ -50,7 +51,7 @@ public class UserService {
         return user;
     }
 
-    public User deleteFriend (Long userId, Long friendId){
+    public User deleteFriend(Long userId, Long friendId) {
         User user = userStorage.getUser(userId);
         User friend = userStorage.getUser(friendId);
         user.getFriends().remove(friend.getId());
@@ -59,7 +60,7 @@ public class UserService {
         return user;
     }
 
-    public List <User> mutualFriends (Long userId1, Long userId2){
+    public List<User> mutualFriends(Long userId1, Long userId2) {
         User user1 = userStorage.getUser(userId1);
         User user2 = userStorage.getUser(userId2);
         return user1.getFriends()
@@ -68,13 +69,14 @@ public class UserService {
                 .map(userStorage::getUser)
                 .collect(Collectors.toList());
     }
-    public List <User> getFriends (Long id){
+
+    public List<User> getFriends(Long id) {
         User user = userStorage.getUser(id);
-       return user.getFriends().stream().map(userStorage :: getUser).collect(Collectors.toList());
+        return user.getFriends().stream().map(userStorage::getUser).collect(Collectors.toList());
     }
 
-    private void checkId (Long id){
-        if (id<1){
+    private void checkId(Long id) {
+        if (id < 1) {
             throw new IllegalArgumentException("ID не может быть отрицательным");
         }
         if (userStorage.getUser(id) == null) {
