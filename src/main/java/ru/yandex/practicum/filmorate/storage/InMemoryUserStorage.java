@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
@@ -19,9 +18,9 @@ public class InMemoryUserStorage implements UserStorage {
     private Long generatedId = 1L;
 
 
-    public User addUser(User user) throws ValidationException {
+    public User addUser(User user) {
         log.info("Получен запрос: add-user");
-        checkWhitespace(user);
+
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
@@ -32,18 +31,13 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
 
-    public User updateUser(User user) throws ValidationException {
+    public User updateUser(User user) {
         log.info("Получен запрос: update-user");
-        checkWhitespace(user);
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
-        if (users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            return user;
-        } else {
-            throw new ValidationException("Пользователя с таким id нет");
-        }
+        users.put(user.getId(), user);
+        return user;
     }
 
 
@@ -54,10 +48,5 @@ public class InMemoryUserStorage implements UserStorage {
     public User getUser(Long id) {
         return users.get(id);
     }
-    private void checkWhitespace(User user) throws ValidationException {
-        if (user.getLogin().contains(" ")) {
-            log.info("Login содержит пробел");
-            throw new ValidationException("Name содержит пробел");
-        }
-    }
+
 }
