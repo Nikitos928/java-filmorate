@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controllers.FilmController;
 import ru.yandex.practicum.filmorate.controllers.UserController;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -201,7 +202,7 @@ class FilmorateApplicationTests {
                 .releaseDate(LocalDate.of(2000, 12, 12))
                 .build();
 
-        Assertions.assertThrows(ValidationException.class, () -> filmController.updateFilm(film3));
+        Assertions.assertThrows(NotFoundException.class, () -> filmController.updateFilm(film3));
 
 
         Film film4 = Film.builder()
@@ -271,7 +272,7 @@ class FilmorateApplicationTests {
                 .login("Login")
                 .name("Name").build();
 
-        Assertions.assertThrows(ValidationException.class, () -> userController.updateUser(user3));
+        Assertions.assertThrows(NotFoundException.class, () -> userController.updateUser(user3));
 
         User user4 = User.builder()
                 .birthday(LocalDate.of(2000, 12, 12))
