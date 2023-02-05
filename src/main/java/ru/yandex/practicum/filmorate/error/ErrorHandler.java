@@ -21,7 +21,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handlePostNotFoundException(final PostNotFoundException e) {
+    public ErrorResponse postNotFoundException(final PostNotFoundException e) {
         return new ErrorResponse(
                 e.getMessage()
         );
