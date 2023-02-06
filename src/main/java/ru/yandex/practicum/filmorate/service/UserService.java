@@ -41,9 +41,10 @@ public class UserService {
     public User addFriend(Long userId, Long friendId) {
         checkId(userId);
         if (0 > friendId) {
-            throw new NotFoundException(String.format(
-                    "Пользователь %s не найден",
-                    userId));
+            throw new NotFoundException("ID не может быть отрицательным");
+        }
+        if (friendId.equals(userId)) {
+            throw new NotFoundException("Самого себя добавить в друзья нельзя");
         }
         User user = userStorage.getUser(userId);
         User friend = userStorage.getUser(friendId);
@@ -55,11 +56,21 @@ public class UserService {
     }
 
     public User deleteFriend(Long userId, Long friendId) {
+        if (userStorage.getUser(userId) == null){
+            throw new NotFoundException(String.format(
+                    "Пользователь %s не найден",
+                    userId));
+        }
+        if (userStorage.getUser(friendId) == null){
+            throw new NotFoundException(String.format(
+                    "Пользователь %s не найден",
+                    friendId));
+        }
         User user = userStorage.getUser(userId);
         User friend = userStorage.getUser(friendId);
         user.getFriendIds().remove(friend.getId());
         friend.getFriendIds().remove(user.getId());
-        log.info("Пользователь c ID:" + user.getId() + " удалил пользователя с ID:" + friend.getId() + " из друзей");
+        log.info("Пользователь c ID: " + user.getId() + " удалил пользователя с ID:" + friend.getId() + " из друзей");
         return user;
     }
 

@@ -16,7 +16,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
     private Long generatedId = 1L;
 
-
+@Override
     public Film addFilm(Film film) {
         log.info("Получен запрос: add-film");
         film.setId(generatedId);
@@ -25,7 +25,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
-
+    @Override
     public Film updateFilm(Film film) {
         log.info("Получен запрос: update-film");
         films.put(film.getId(), film);
@@ -33,7 +33,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     }
 
-
+    @Override
     public List<Film> getFilms() {
         log.info("Получен запрос: get-films");
         return new ArrayList<>(films.values());

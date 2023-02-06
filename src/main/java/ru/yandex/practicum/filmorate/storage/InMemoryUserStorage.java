@@ -17,7 +17,7 @@ public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
     private Long generatedId = 1L;
 
-
+    @Override
     public User addUser(User user) {
         log.info("Получен запрос: add-user");
 
@@ -30,7 +30,7 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-
+    @Override
     public User updateUser(User user) {
         log.info("Получен запрос: update-user");
         if (user.getName() == null || user.getName().isEmpty()) {
@@ -40,11 +40,11 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-
+    @Override
     public List<User> getUsers() {
         return new ArrayList<>(users.values());
     }
-
+    @Override
     public User getUser(Long id) {
         return users.get(id);
     }
