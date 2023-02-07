@@ -13,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@SpringBootApplication
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;

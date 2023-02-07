@@ -54,7 +54,7 @@ public class FilmService {
     public Film addLike(Long filmId, Long userId) {
         checkId(filmId);
         if (userStorage.getUser(userId) == null) {
-            throw new IllegalArgumentException("ID не может быть отрицательным");
+            throw new NotFoundException("Пользователь с ID: " + userId + " не найден");
         }
         Film film = filmStorage.getFilm(filmId);
         User user = userStorage.getUser(userId);
@@ -64,9 +64,9 @@ public class FilmService {
     }
 
     public Film deleteLike(Long filmId, Long userId) {
-        if (0 > userId) {
+        if (userStorage.getUser(userId) == null) {
             throw new NotFoundException(String.format(
-                    "Фильм %s не найден",
+                    "Пользователь %s не найден",
                     userId));
         }
         checkId(filmId);

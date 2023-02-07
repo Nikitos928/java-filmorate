@@ -21,9 +21,6 @@ public class InMemoryUserStorage implements UserStorage {
     public User addUser(User user) {
         log.info("Получен запрос: add-user");
 
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
         user.setId(generatedId);
         users.put(generatedId, user);
         generatedId++;
@@ -33,9 +30,6 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         log.info("Получен запрос: update-user");
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
         users.put(user.getId(), user);
         return user;
     }

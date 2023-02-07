@@ -19,12 +19,18 @@ public class UserService {
 
     public User addUser(User user) throws ValidationException {
         checkWhitespace(user);
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
         return userStorage.addUser(user);
     }
 
     public User updateUser(User user) throws ValidationException {
         checkWhitespace(user);
         checkId(user.getId());
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
         return userStorage.updateUser(user);
     }
 
@@ -45,6 +51,12 @@ public class UserService {
         }
         if (friendId.equals(userId)) {
             throw new NotFoundException("Самого себя добавить в друзья нельзя");
+        }
+        if (userStorage.getUser(friendId) == null){
+            throw new NotFoundException("Пользователь с ID: " + friendId + " не найден");
+        }
+        if (userStorage.getUser(userId) == null){
+            throw new NotFoundException("Пользователь c ID: "+ userId +" не найден");
         }
         User user = userStorage.getUser(userId);
         User friend = userStorage.getUser(friendId);
