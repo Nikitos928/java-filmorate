@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable(value = "id") Long userId, @PathVariable(value = "friendId") Long friendId) {
+    public User addFriend(@PathVariable(value = "id") Long userId, @PathVariable(value = "friendId") Long friendId) throws ValidationException {
 
         return userService.addFriend(userId, friendId);
     }

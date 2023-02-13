@@ -19,20 +19,18 @@ public class UserService {
 
     public User addUser(User user) throws ValidationException {
         checkWhitespace(user);
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
+        checkName (user);
         return userStorage.addUser(user);
     }
 
     public User updateUser(User user) throws ValidationException {
         checkWhitespace(user);
         checkId(user.getId());
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
+        checkName (user);
         return userStorage.updateUser(user);
     }
+
+
 
     public List<User> getUsers() {
         return userStorage.getUsers();
@@ -44,13 +42,13 @@ public class UserService {
         return userStorage.getUser(id);
     }
 
-    public User addFriend(Long userId, Long friendId) {
+    public User addFriend(Long userId, Long friendId) throws ValidationException {
         checkId(userId);
         if (0 > friendId) {
             throw new NotFoundException("ID не может быть отрицательным");
         }
         if (friendId.equals(userId)) {
-            throw new NotFoundException("Самого себя добавить в друзья нельзя");
+            throw new ValidationException("Самого себя добавить в друзья нельзя");
         }
         if (userStorage.getUser(friendId) == null){
             throw new NotFoundException("Пользователь с ID: " + friendId + " не найден");
@@ -117,5 +115,13 @@ public class UserService {
             log.info("Login содержит пробел");
             throw new ValidationException("Login содержит пробел");
         }
+    }
+
+    private User checkName (User user) {
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+            return user;
+        }
+        return user;
     }
 }
