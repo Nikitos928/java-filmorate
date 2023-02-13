@@ -5,12 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Data
@@ -18,7 +19,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class Film {
-    private int id;
+    private Long id;
     @NotEmpty
     private String name;
     @Size(max = 200, message = "Длинна описания должна быть не больше 200 символов")
@@ -27,4 +28,6 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private int duration;
+    private Set<Long> whoLikedUserIds = new HashSet<>();
+
 }
