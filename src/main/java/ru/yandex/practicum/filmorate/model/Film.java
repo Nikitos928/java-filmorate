@@ -29,5 +29,8 @@ public class Film {
     @Positive
     private int duration;
     private Set<Long> whoLikedUserIds = new HashSet<>();
+    private Set<Mpa> genres;
+    private Mpa mpa;
+    private Integer rate;
 
 }

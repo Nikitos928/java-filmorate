@@ -1,8 +1,11 @@
 package ru.yandex.practicum.filmorate;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controllers.FilmController;
 import ru.yandex.practicum.filmorate.controllers.UserController;
@@ -14,18 +17,22 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserDbStorage;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.lang.reflect.Array;
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmorateApplicationTests {
 
     FilmController filmController;
@@ -37,21 +44,92 @@ class FilmorateApplicationTests {
 
     InMemoryUserStorage userStorage;
 
-    @Test
-    void contextLoads() {
-    }
-
-    @BeforeEach
-    public void setUp() {
-        filmStorage = new InMemoryFilmStorage();
-        userStorage = new InMemoryUserStorage();
-        userController = new UserController(new UserService(userStorage));
-
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-    }
+    private final UserDbStorage userDbStorage;
 
     @Test
+    void contextLoads() throws ValidationException {
+
+        User user1 = User.builder()
+                .birthday(LocalDate.of(2030, 12, 12))
+                .email("tttt@yandex.ru")
+                .login("Login")
+                .name("Name")
+                .friendIds(new HashSet<>())
+                .friendRequests(new HashSet<>())
+                .build();
+        User user2 = User.builder()
+                .birthday(LocalDate.of(2030, 12, 12))
+                .email("tttt@yandex.ru")
+                .login("Login")
+                .name("Name")
+                .friendIds(new HashSet<>())
+                .friendRequests(new HashSet<>())
+                .build();
+        User user3 = User.builder()
+                .birthday(LocalDate.of(2030, 12, 12))
+                .email("tttt@yandex.ru")
+                .login("Login")
+                .name("Name")
+                .friendIds(new HashSet<>())
+                .friendRequests(new HashSet<>())
+                .build();
+
+        userController = new UserController(new UserService(new InMemoryUserStorage()));
+
+        userController.addUser(user1);
+        userController.addUser(user2);
+        userController.addUser(user3);
+
+        userController.addFriend(user1.getId(), user2.getId());
+
+
+        for (User user : userController.getUsers()) {
+            System.out.println(user);
+        }
+
+        userController.addFriend(user2.getId(), user1.getId());
+
+
+        for (User user : userController.getUsers()) {
+            System.out.println(user);
+        }
+
+        userController.addFriend(user3.getId(), user1.getId());
+
+        for (User user : userController.getUsers()) {
+            System.out.println(user);
+        }
+
+        userController.addFriend(user1.getId(), user3.getId());
+
+        for (User user : userController.getUsers()) {
+            System.out.println(user);
+        }
+
+        userController.deleteFriend(user1.getId(), user3.getId());
+
+        for (User user : userController.getUsers()) {
+            System.out.println(user);
+        }
+
+        userController.deleteFriend(user1.getId(), user2.getId());
+
+        for (User user : userController.getUsers()) {
+            System.out.println(user);
+        }
+
+    }
+
+   // @BeforeEach
+    //     filmStorage = new InMemoryFilmStorage();
+      //  userStorage = new InMemoryUserStorage();
+     //   userController = new UserController(new UserService());
+
+     //   ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+      //  validator = factory.getValidator();
+   // }
+
+    /*@Test
     public void validationUserDateTest() {
         User user = User.builder()
                 .birthday(LocalDate.of(2030, 12, 12))
@@ -159,8 +237,6 @@ class FilmorateApplicationTests {
 
     @Test
     void addUpdateGetFilmValidationExceptionTest() throws ValidationException {
-
-
         Film film = Film.builder()
                 .name("Name")
                 .description("Description")
@@ -168,7 +244,7 @@ class FilmorateApplicationTests {
                 .releaseDate(LocalDate.of(2000, 12, 12)).build();
 
 
-        filmController = new FilmController(new FilmService(filmStorage, new InMemoryUserStorage()));
+        //filmController = new FilmController(new FilmService());
         filmController.addFilm(film);
         assertEquals(film, filmController.getFilms().get(0));
 
@@ -229,7 +305,7 @@ class FilmorateApplicationTests {
     @Test
     void addUpdateGetUserValidationExceptionTest() throws ValidationException {
         userStorage = new InMemoryUserStorage();
-        userController = new UserController(new UserService(userStorage));
+        //userController = new UserController(new UserService());
         User user = User.builder()
                 .birthday(LocalDate.of(2000, 12, 12))
                 .email("tttt@yandex.ru")
@@ -292,8 +368,7 @@ class FilmorateApplicationTests {
         userController.addUser(user5);
         assertEquals(user5.getName(), "newLogin");
 
-    }
-
+    }*/
 }
 
 

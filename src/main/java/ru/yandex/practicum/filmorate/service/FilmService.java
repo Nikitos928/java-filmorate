@@ -1,11 +1,14 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -18,12 +21,19 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
+@RestController
 public class FilmService {
 
-    private final FilmStorage filmStorage;
+    private final String f = "InBbFilmStorage";
 
-    private final UserStorage userStorage;
+    private final String u = "InBbUserStorage";
+
+    @Qualifier(f)
+    @Autowired
+    private FilmStorage filmStorage;
+    @Qualifier(u)
+    @Autowired
+    private UserStorage userStorage;
 
 
     public Film addFilm(Film film) throws ValidationException {
@@ -60,36 +70,39 @@ public class FilmService {
         User user = userStorage.getUser(userId);
         film.getWhoLikedUserIds().add(user.getId());
         log.info("Пользователь с ID: " + userId + "поставил Like фильму с ID: " + filmId);
+        if (f == "InBbFilmStorage") {
+            filmStorage.updateFilm(film);
+        }
         return film;
     }
 
     public Film deleteLike(Long filmId, Long userId) {
-        if (userStorage.getUser(userId) == null) {
-            throw new NotFoundException(String.format(
-                    "Пользователь %s не найден",
-                    userId));
+        if (userId < 0) {
+            throw new NotFoundException(String.format("ID не может быть меньше 0"));
+        }
+
+
+        if (userStorage.getUser(userId) == null || userId < 0 || userStorage.getUsers().size() < userId) {
+            throw new NotFoundException(String.format("Пользователь %s не найден", userId));
         }
         checkId(filmId);
         Film film = filmStorage.getFilm(filmId);
         User user = userStorage.getUser(userId);
         film.getWhoLikedUserIds().remove(user.getId());
+        if (f == "InBbFilmStorage") {
+            filmStorage.updateFilm(film);
+        }
         return film;
     }
 
     public List<Film> getPopularFilms(Long cout) {
-        return filmStorage.getFilms()
-                .stream()
-                .sorted(Comparator.comparing(film -> film.getWhoLikedUserIds().size() * -1))
-                .limit(cout)
-                .collect(Collectors.toList());
+        return filmStorage.getFilms().stream().sorted(Comparator.comparing(film -> film.getWhoLikedUserIds().size() * -1)).limit(cout).collect(Collectors.toList());
     }
 
 
     private void checkId(Long id) {
-        if (id < 1 || filmStorage.getFilm(id) == null) {
-            throw new NotFoundException(String.format(
-                    "Фильм %s не найден",
-                    id));
+        if (id < 1 || filmStorage.getFilms().size() < id) {
+            throw new NotFoundException(String.format("Фильм %s не найден", id));
         }
     }
 
@@ -98,6 +111,30 @@ public class FilmService {
             log.info("Дата не соответствует параметрам");
             throw new ValidationException("Дата релиза не может быть раньше 28.12.1895");
         }
+    }
+
+    public List<Genre> getGenre() {
+
+        return filmStorage.getGenres();
+    }
+
+    public Genre getGenreId(Integer id) throws ValidationException {
+        if (filmStorage.getRating().size() < id || id < 0) {
+            throw new NotFoundException("Такого жанра пока нет");
+        }
+        return filmStorage.getGenres().get(id - 1);
+    }
+
+    public List<Genre> getRatings() {
+
+        return filmStorage.getRating();
+    }
+
+    public Genre getRating(Integer id) throws ValidationException {
+        if (filmStorage.getRating().size() < id || id < 0) {
+            throw new NotFoundException("Такого рейтинга пока нет");
+        }
+        return filmStorage.getRating().get(id - 1);
     }
 
 }
