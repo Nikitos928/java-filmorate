@@ -24,16 +24,18 @@ import java.util.stream.Collectors;
 @RestController
 public class FilmService {
 
-    private final String f = "InBbFilmStorage";
+    private final String f = "InDbFilmStorage";
 
-    private final String u = "InBbUserStorage";
+    private final String u = "InDbUserStorage";
 
-    @Qualifier(f)
-    @Autowired
-    private FilmStorage filmStorage;
-    @Qualifier(u)
-    @Autowired
-    private UserStorage userStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
+
+    public FilmService(@Qualifier(f) FilmStorage filmStorage, @Qualifier(u) UserStorage userStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+        this.filmStorage.getGenres();
+    }
 
 
     public Film addFilm(Film film) throws ValidationException {
@@ -49,7 +51,6 @@ public class FilmService {
         } else {
             throw new ValidationException("Фильма с таки id нет");
         }
-
     }
 
     public List<Film> getFilms() {
@@ -70,9 +71,7 @@ public class FilmService {
         User user = userStorage.getUser(userId);
         film.getWhoLikedUserIds().add(user.getId());
         log.info("Пользователь с ID: " + userId + "поставил Like фильму с ID: " + filmId);
-        if (f == "InBbFilmStorage") {
-            filmStorage.updateFilm(film);
-        }
+        filmStorage.updateFilm(film);
         return film;
     }
 
@@ -80,8 +79,6 @@ public class FilmService {
         if (userId < 0) {
             throw new NotFoundException(String.format("ID не может быть меньше 0"));
         }
-
-
         if (userStorage.getUser(userId) == null || userId < 0 || userStorage.getUsers().size() < userId) {
             throw new NotFoundException(String.format("Пользователь %s не найден", userId));
         }
@@ -89,9 +86,7 @@ public class FilmService {
         Film film = filmStorage.getFilm(filmId);
         User user = userStorage.getUser(userId);
         film.getWhoLikedUserIds().remove(user.getId());
-        if (f == "InBbFilmStorage") {
-            filmStorage.updateFilm(film);
-        }
+        filmStorage.updateFilm(film);
         return film;
     }
 
@@ -114,7 +109,6 @@ public class FilmService {
     }
 
     public List<Genre> getGenre() {
-
         return filmStorage.getGenres();
     }
 
@@ -126,7 +120,6 @@ public class FilmService {
     }
 
     public List<Genre> getRatings() {
-
         return filmStorage.getRating();
     }
 

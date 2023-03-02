@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserStorage userStorage;
 
-    private final String x = "InBbUserStorage";
+    private final String x = "InDbUserStorage";
 
     public UserService(@Qualifier(x) UserStorage userStorage) {
         this.userStorage = userStorage;
@@ -51,11 +51,13 @@ public class UserService {
         return userStorage.getUser(id);
     }
 
-    public User addFriend(Long userId, Long friendId) throws ValidationException {
-        checkId(userId);
-        if (0 > friendId) {
+    public User addFriend(Long friendId, Long userId) throws ValidationException {
+        if (friendId < 0 || userId < 0 ) {
             throw new NotFoundException("ID не может быть отрицательным");
         }
+
+        checkId(userId);
+
         if (friendId.equals(userId)) {
             throw new ValidationException("Самого себя добавить в друзья нельзя");
         }
@@ -65,21 +67,13 @@ public class UserService {
 
         if (userStorage.getUser(userId) == null) {
             throw new NotFoundException("Пользователь c ID: " + userId + " не найден");
+        }
 
-        }
-        if (userStorage.getUser(friendId).getFriendRequests().contains(userId)) {
-            throw new NotFoundException("Вы уже подали заявку в друзья");
-        }
         User user = userStorage.getUser(userId);
         User friend = userStorage.getUser(friendId);
 
-        user.getFriendIds().add(friendId);
-
-
-        if (x == "InBbUserStorage") {
-            userStorage.updateUser(user);
-            userStorage.updateUser(friend);
-        }
+        friend.getFriendIds().add(userId);
+        userStorage.updateUser(friend);
 
         return user;
     }
@@ -101,10 +95,10 @@ public class UserService {
         friend.getFriendIds().remove(user.getId());
         log.info(String.format("Пользователь c ID: %s удалил пользователя %s из друзей", user.getId(), friend.getId()));
 
-        if (x == "InBbUserStorage") {
-            userStorage.updateUser(user);
-            userStorage.updateUser(friend);
-        }
+
+        userStorage.updateUser(user);
+        userStorage.updateUser(friend);
+
 
         return user;
     }

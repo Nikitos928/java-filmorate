@@ -1,26 +1,27 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import Mapper.SetMapper;
-import Mapper.UserMapper;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import ru.yandex.practicum.filmorate.mapper.SetMapper;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.model.Like;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
-@Qualifier("InBbUserStorage")
+@Qualifier("InDbUserStorage")
 public class UserDbStorage implements UserStorage {
 
     private Long id = 1L;
-
-    private Long idForFrind = 1L;
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -28,12 +29,32 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User addUser(User user) {
         user.setId(id);
-        jdbcTemplate.update("INSERT INTO USERS VALUES (?,?,?,?,?)",
+       /* jdbcTemplate.update("INSERT INTO USERS VALUES (?,?,?,?,?)",
                 user.getId(),
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
                 user.getBirthday());
+
+        Date.valueOf(
+*/
+        jdbcTemplate.batchUpdate("INSERT INTO USERS VALUES (?,?,?,?,?)", new BatchPreparedStatementSetter() {
+        @Override
+        public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+            preparedStatement.setInt(1, user.getId().intValue());
+            preparedStatement.setString(2, user.getEmail());
+            preparedStatement.setString(3, user.getLogin());
+            preparedStatement.setString(4, user.getName());
+            preparedStatement.setDate(5, Date.valueOf(user.getBirthday()));
+
+        }
+
+            @Override
+            public int getBatchSize() {
+                return 1;
+            }});
+
+
         id++;
         return user;
     }
@@ -41,19 +62,18 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
 
-        jdbcTemplate.update("DELETE FROM FRIENDS WHERE USER_1 = ? AND STATUS = 'Подтвержденная'", user.getId());
-        jdbcTemplate.update("DELETE FROM FRIENDS WHERE USER_1 = ? AND STATUS = 'Не подтвежденная'", user.getId());
-
-        for (Long friend : user.getFriendRequests()) {
-            jdbcTemplate.update("INSERT INTO FRIENDS VALUES (?,?,?,?)", idForFrind, user.getId(), friend, "Не подтвежденная");
-            idForFrind++;
-        }
+        jdbcTemplate.update("DELETE FROM FRIENDS WHERE USER_1 = ? AND STATUS = true", user.getId());
+        jdbcTemplate.update("DELETE FROM FRIENDS WHERE USER_1 = ? AND STATUS = false", user.getId());
 
         for (Long friend : user.getFriendIds()) {
-            jdbcTemplate.update("INSERT INTO FRIENDS VALUES (?,?,?,?)", idForFrind, user.getId(), friend, "Подтвержденная");
-            idForFrind++;
+            if (getUser(friend).getFriendIds().contains(user.getId())) {
+                jdbcTemplate.update("DELETE FROM FRIENDS" +
+                        " WHERE USER_1 = ? AND USER_2 = ? AND STATUS = ? ",friend, user.getId(), false);
+                jdbcTemplate.update("INSERT INTO FRIENDS VALUES (?,?,?)",  user.getId(), friend, true);
+            } else {
+                jdbcTemplate.update("INSERT INTO FRIENDS VALUES (?,?,?)",  user.getId(), friend, false);
+            }
         }
-
 
         jdbcTemplate.update("UPDATE USERS SET EMAIL=?, LOGIN=?, NAME=?, BIRTHDAY=? WHERE ID = ?",
                 user.getEmail(),
@@ -61,47 +81,83 @@ public class UserDbStorage implements UserStorage {
                 user.getName(),
                 user.getBirthday(),
                 user.getId()
-
         );
-
         return user;
     }
 
     @Override
     public List<User> getUsers() {
-        List<User> friends = new ArrayList<>(jdbcTemplate.query("SELECT * FROM USERS", new UserMapper()));
-        for (User friend : friends) {
-            friend.setFriendIds((Set<Long>) jdbcTemplate.query("SELECT USER_2 ID " +
-                            "FROM FRIENDS " +
-                            "WHERE USER_1 = ? AND STATUS = 'Подтвержденная'",
-                    new Object[]{friend.getId()}, new SetMapper()).stream().collect(Collectors.toSet()));
+        List<User> users = new ArrayList<>(jdbcTemplate.query("SELECT * FROM USERS", new UserMapper()));
+
+        Map <Long, HashSet<Long>> friends = new HashMap<>();
+
+        for (Like like : jdbcTemplate.query("SELECT USER_1, USER_2 " +
+                        "FROM FRIENDS " +
+                        "WHERE STATUS = true",
+                (rs, rowNum) -> new Like(rs.getLong(1), rs.getLong(2)))) {
+            HashSet <Long> friendsSet = new HashSet<>();
+            friendsSet.add(like.getLike2());
+            friends.put(like.getLike1(), friendsSet);
         }
 
-        for (User friend : friends) {
-            friend.setFriendRequests((Set<Long>) jdbcTemplate.query("SELECT USER_2 ID " +
-                            "FROM FRIENDS " +
-                            "WHERE USER_1 = ? AND STATUS = 'Не подтвежденная'",
-                    new Object[]{friend.getId()}, new SetMapper()).stream().collect(Collectors.toSet()));
+        for (Like like : jdbcTemplate.query("SELECT USER_2, USER_1 " +
+                        "FROM FRIENDS " +
+                        "WHERE STATUS = true",
+                (rs, rowNum) -> new Like(rs.getLong(1), rs.getLong(2)))) {
+            if(!friends.containsKey(like.getLike1())) {
+                HashSet<Long> friendsSet = new HashSet<>();
+                friendsSet.add(like.getLike2());
+                friends.put(like.getLike1(), friendsSet);
+            } else {
+                friends.get(like.getLike1()).add(like.getLike2());
+            }
         }
-        return friends;
+
+        for (Like like : jdbcTemplate.query("SELECT USER_2, USER_1 " +
+                        "FROM FRIENDS " +
+                        "WHERE STATUS = false",
+                (rs, rowNum) -> new Like(rs.getLong(1), rs.getLong(2)))) {
+            if(!friends.containsKey(like.getLike2())) {
+                HashSet<Long> friendsSet = new HashSet<>();
+                friendsSet.add(like.getLike1());
+                friends.put(like.getLike2(), friendsSet);
+            } else {
+                friends.get(like.getLike2()).add(like.getLike1());
+            }
+        }
+
+        for (User user : users) {
+            if (friends.containsKey(user.getId())) {
+                user.setFriendIds(friends.get(user.getId()));
+            }
+        }
+        return users;
     }
 
     @Override
     public User getUser(Long id) {
 
-        User user = (User) jdbcTemplate.query("SELECT * FROM USERS WHERE ID = ?", new Object[]{id}, new UserMapper())
+
+        User user = (User) jdbcTemplate.query("SELECT * FROM USERS WHERE ID = ?" , new UserMapper(), id)
                 .stream().findAny().orElse(null);
 
-        user.setFriendIds((Set<Long>) jdbcTemplate.query("SELECT USER_2 ID " +
+        user.getFriendIds().addAll((Set<Long>) jdbcTemplate.query("SELECT USER_2 ID " +
                         "FROM FRIENDS " +
-                        "WHERE USER_1=? AND STATUS = 'Подтвержденная'",
-                new Object[]{id}, new SetMapper()).stream().collect(Collectors.toSet()));
+                        "WHERE USER_1=? AND STATUS = true",
+                new SetMapper(), id).stream().collect(Collectors.toSet()));
 
-        user.setFriendRequests((Set<Long>) jdbcTemplate.query("SELECT USER_2 ID " +
+        user.getFriendIds().addAll((Set<Long>) jdbcTemplate.query("SELECT USER_1 ID " +
                         "FROM FRIENDS " +
-                        "WHERE USER_1=? AND STATUS = 'Не подтвежденная'",
-                new Object[]{id}, new SetMapper()).stream().collect(Collectors.toSet()));
+                        "WHERE USER_2=? AND STATUS = true",
+                new SetMapper(), id).stream().collect(Collectors.toSet()));
+
+        user.getFriendIds().addAll((Set<Long>) jdbcTemplate.query("SELECT USER_2 ID " +
+                        "FROM FRIENDS " +
+                        "WHERE USER_1 = ? AND STATUS = false",
+                new SetMapper(), id).stream().collect(Collectors.toSet()));
 
         return user;
     }
+
+
 }

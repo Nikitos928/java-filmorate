@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.util.*;
 
 @Service
-@Qualifier("InMemory")
+@Qualifier("InMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final Map<Long, Film> films = new HashMap<>();
