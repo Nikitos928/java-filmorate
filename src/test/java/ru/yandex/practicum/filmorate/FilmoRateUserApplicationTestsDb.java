@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserDbStorage;
 
 import java.time.LocalDate;
@@ -36,7 +35,7 @@ class FilmoRateUserApplicationTestsDb {
                 .friendIds(new HashSet<>())
                 .build();
 
-       userStorage.addUser(user1);
+        userStorage.addUser(user1);
 
         Optional<User> userOptional = Optional.ofNullable(userStorage.getUser(1L));
 
@@ -83,10 +82,7 @@ class FilmoRateUserApplicationTestsDb {
                 .hasValue(Arrays.asList(user1, user2));
 
 
-
     }
-
-
 
 
 }

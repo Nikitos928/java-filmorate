@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmDbStorage;
 
 import java.time.LocalDate;
@@ -99,7 +98,6 @@ public class FilmoRateFilmApplicationTestsDb {
                         new Genre(3, "PG-13"),
                         new Genre(4, "R"),
                         new Genre(5, "NC-17")));
-
 
 
     }

@@ -192,7 +192,7 @@ public class FilmDbStorage implements FilmStorage {
 
         film.setWhoLikedUserIds((Set<Long>) jdbcTemplate.query("SELECT USER_ID ID " +
                         "FROM LIKE_FILM WHERE FILM_ID=?",
-                 new SetMapper(), id).stream().collect(Collectors.toSet()));
+                new SetMapper(), id).stream().collect(Collectors.toSet()));
 
         Set<Genre> genres = new HashSet<>();
 

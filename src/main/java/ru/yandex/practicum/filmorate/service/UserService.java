@@ -52,7 +52,7 @@ public class UserService {
     }
 
     public User addFriend(Long friendId, Long userId) throws ValidationException {
-        if (friendId < 0 || userId < 0 ) {
+        if (friendId < 0 || userId < 0) {
             throw new NotFoundException("ID не может быть отрицательным");
         }
 
