@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controllers.FilmController;
 import ru.yandex.practicum.filmorate.controllers.UserController;
@@ -24,8 +25,6 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
-@SpringBootTest
 class FilmorateApplicationTests {
 
     FilmController filmController;
@@ -43,12 +42,12 @@ class FilmorateApplicationTests {
 
     @BeforeEach
     public void setUp() {
-        filmStorage = new InMemoryFilmStorage();
-        userStorage = new InMemoryUserStorage();
-        userController = new UserController(new UserService(userStorage));
+      filmStorage = new InMemoryFilmStorage();
+      userStorage = new InMemoryUserStorage();
+      userController = new UserController(new UserService(userStorage));
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+       validator = factory.getValidator();
     }
 
     @Test
@@ -170,7 +169,7 @@ class FilmorateApplicationTests {
 
         filmController = new FilmController(new FilmService(filmStorage, new InMemoryUserStorage()));
         filmController.addFilm(film);
-        assertEquals(film, filmController.getFilms().get(0));
+        assertEquals(film, filmController.getFilm(film.getId()));
 
         Film film1 = Film.builder().id(1L)
                 .name("Name")
@@ -295,6 +294,7 @@ class FilmorateApplicationTests {
     }
 
 }
+
 
 
 
