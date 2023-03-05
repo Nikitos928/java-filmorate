@@ -12,8 +12,8 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
 @RequiredArgsConstructor
+@RequestMapping("/users")
 
 public class UserController {
     private final UserService userService;
@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable(value = "id") Long userId) {
+    public User getUser(@PathVariable(value = "id") Long userId) throws ValidationException {
         return userService.getUser(userId);
     }
 

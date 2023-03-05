@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controllers.FilmController;
 import ru.yandex.practicum.filmorate.controllers.UserController;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -20,12 +19,12 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
-@SpringBootTest
 class FilmorateApplicationTests {
 
     FilmController filmController;
@@ -46,7 +45,7 @@ class FilmorateApplicationTests {
         filmStorage = new InMemoryFilmStorage();
         userStorage = new InMemoryUserStorage();
         userController = new UserController(new UserService(userStorage));
-
+        filmController = new FilmController(new FilmService(filmStorage, userStorage));
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
@@ -160,17 +159,15 @@ class FilmorateApplicationTests {
     @Test
     void addUpdateGetFilmValidationExceptionTest() throws ValidationException {
 
-
         Film film = Film.builder()
                 .name("Name")
                 .description("Description")
                 .duration(30)
                 .releaseDate(LocalDate.of(2000, 12, 12)).build();
 
-
-        filmController = new FilmController(new FilmService(filmStorage, new InMemoryUserStorage()));
         filmController.addFilm(film);
-        assertEquals(film, filmController.getFilms().get(0));
+
+        assertEquals(film, filmController.getFilm(film.getId()));
 
         Film film1 = Film.builder().id(1L)
                 .name("Name")
@@ -228,13 +225,12 @@ class FilmorateApplicationTests {
 
     @Test
     void addUpdateGetUserValidationExceptionTest() throws ValidationException {
-        userStorage = new InMemoryUserStorage();
-        userController = new UserController(new UserService(userStorage));
         User user = User.builder()
                 .birthday(LocalDate.of(2000, 12, 12))
                 .email("tttt@yandex.ru")
                 .login("Login")
                 .name("Name")
+                .friendIds(new HashSet<>())
                 .build();
 
         userController.addUser(user);
@@ -247,6 +243,7 @@ class FilmorateApplicationTests {
                 .email("tt@yandex.ru")
                 .login("Login")
                 .name("Name")
+                .friendIds(new HashSet<>())
                 .build();
 
         userController.updateUser(user1);
@@ -258,6 +255,7 @@ class FilmorateApplicationTests {
                 .birthday(LocalDate.of(2001, 12, 12))
                 .email("yyyy@yandex.ru")
                 .login("Login1")
+                .friendIds(new HashSet<>())
                 .name("Name1").build();
 
         userController.addUser(user2);
@@ -270,6 +268,7 @@ class FilmorateApplicationTests {
                 .birthday(LocalDate.of(2000, 12, 12))
                 .email("tt@yandex.ru")
                 .login("Login")
+                .friendIds(new HashSet<>())
                 .name("Name").build();
 
         Assertions.assertThrows(NotFoundException.class, () -> userController.updateUser(user3));
@@ -278,6 +277,7 @@ class FilmorateApplicationTests {
                 .birthday(LocalDate.of(2000, 12, 12))
                 .email("tt@yandex.ru")
                 .login("Lo gin")
+                .friendIds(new HashSet<>())
                 .name("Name").build();
 
         Assertions.assertThrows(ValidationException.class, () -> userController.updateUser(user4));
@@ -288,13 +288,26 @@ class FilmorateApplicationTests {
                 .birthday(LocalDate.of(2000, 12, 12))
                 .email("tt@yandex.ru")
                 .login("newLogin")
+                .friendIds(new HashSet<>())
                 .build();
         userController.addUser(user5);
         assertEquals(user5.getName(), "newLogin");
 
+        userController.addFriend(user2.getId(), user1.getId());
+        userController.addFriend(user2.getId(), user5.getId());
+
+        assertEquals(userController.getFriends(user2.getId()), Arrays.asList(user1, user5));
+        user4.setLogin("Логин");
+        userController.addUser(user4);
+
+        userController.addFriend(user4.getId(), user1.getId());
+
+        assertEquals(userController.mutualFriends(user2.getId(), user4.getId()), Arrays.asList(user1));
+
     }
 
 }
+
 
 
 
